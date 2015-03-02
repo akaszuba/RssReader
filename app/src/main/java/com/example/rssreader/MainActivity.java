@@ -18,6 +18,8 @@ import android.support.v4.widget.DrawerLayout;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
 
 public class MainActivity extends ActionBarActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks {
@@ -31,6 +33,7 @@ public class MainActivity extends ActionBarActivity
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
      */
     private CharSequence mTitle;
+    private ArrayList<RssFeed> mRssFeedList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,29 +48,43 @@ public class MainActivity extends ActionBarActivity
         mNavigationDrawerFragment.setUp(
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
+
+
+        //TODO: Get this from database
+        mRssFeedList = new ArrayList<>();
+        RssFeed rss1 = RssFeed.CreateNew();
+        rss1.setFeedName("Wykop.pl");
+        mRssFeedList.add(rss1);
+        RssFeed rss2 = RssFeed.CreateNew();
+        rss2.setFeedName("Onet.pl");
+        mRssFeedList.add(rss2);
+        RssFeed rss3 = RssFeed.CreateNew();
+        rss3.setFeedName("Interia.pl");
+        mRssFeedList.add(rss3);
+
+        mNavigationDrawerFragment.setRssFeedList(mRssFeedList);
     }
 
     @Override
-    public void onNavigationDrawerItemSelected(int position) {
+    public void onNavigationDrawerItemSelected(final String rssFeedId) {
+
+        //Get rss feed by id
+        RssFeed currentFeed = AU.Find(mRssFeedList, new AU.SearchKey<RssFeed>() {
+            @Override
+            public Boolean Accept(RssFeed item) {
+                return item.getId() == rssFeedId;
+            }
+        });
+
         // update the main content by replacing fragments
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
-                .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
+                .replace(R.id.container, PlaceholderFragment.newInstance(currentFeed))
                 .commit();
     }
 
-    public void onSectionAttached(int number) {
-        switch (number) {
-            case 1:
-                mTitle = getString(R.string.title_section1);
-                break;
-            case 2:
-                mTitle = getString(R.string.title_section2);
-                break;
-            case 3:
-                mTitle = getString(R.string.title_section3);
-                break;
-        }
+    public void onSectionAttached(String rssFeedName) {
+        mTitle = rssFeedName;
     }
 
     public void restoreActionBar() {
@@ -114,27 +131,32 @@ public class MainActivity extends ActionBarActivity
          * The fragment argument representing the section number for this
          * fragment.
          */
-        private static final String ARG_SECTION_NUMBER = "section_number";
+        private RssFeed mRssFeed;
+        private TextView displayedText;
 
         /**
          * Returns a new instance of this fragment for the given section
          * number.
          */
-        public static PlaceholderFragment newInstance(int sectionNumber) {
+        public static PlaceholderFragment newInstance(RssFeed rssFeed) {
             PlaceholderFragment fragment = new PlaceholderFragment();
-            Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            fragment.setArguments(args);
+            fragment.setRssFeed(rssFeed);
             return fragment;
         }
 
         public PlaceholderFragment() {
         }
 
+        private void setRssFeed(RssFeed rssFeed){
+            mRssFeed = rssFeed;
+        }
+
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+            displayedText = (TextView) rootView.findViewById(R.id.textView);
+            displayedText.setText(mRssFeed.getFeedName());
             return rootView;
         }
 
@@ -142,7 +164,7 @@ public class MainActivity extends ActionBarActivity
         public void onAttach(Activity activity) {
             super.onAttach(activity);
             ((MainActivity) activity).onSectionAttached(
-                    getArguments().getInt(ARG_SECTION_NUMBER));
+                    mRssFeed.getFeedName());
         }
     }
 

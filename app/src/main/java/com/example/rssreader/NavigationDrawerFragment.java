@@ -24,6 +24,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+
 /**
  * Fragment used for managing interactions for and presentation of a navigation drawer.
  * See the <a href="https://developer.android.com/design/patterns/navigation-drawer.html#Interaction">
@@ -76,9 +78,6 @@ public class NavigationDrawerFragment extends Fragment {
             mCurrentSelectedPosition = savedInstanceState.getInt(STATE_SELECTED_POSITION);
             mFromSavedInstanceState = true;
         }
-
-        // Select either the default item (0) or the last selected item.
-        selectItem(mCurrentSelectedPosition);
     }
 
     @Override
@@ -89,7 +88,7 @@ public class NavigationDrawerFragment extends Fragment {
     }
 
 
-    private ArrayAdapter<String> mAdapter;
+    private ArrayAdapter<DrawerViewModel> mAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -105,25 +104,33 @@ public class NavigationDrawerFragment extends Fragment {
             }
         });
 
-        mAdapter = new ArrayAdapter<String>(
-                getActionBar().getThemedContext(),
-                android.R.layout.simple_list_item_activated_1,
-                android.R.id.text1, new String[]{
-                getString(R.string.title_section1),
-                getString(R.string.title_section2),
-                getString(R.string.title_section3),
-        });
-
-        mDrawerListView.setAdapter(mAdapter);
-
-
-
-        mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
         return mDrawerListView;
     }
 
     public boolean isDrawerOpen() {
         return mDrawerLayout != null && mDrawerLayout.isDrawerOpen(mFragmentContainerView);
+    }
+
+    public void setRssFeedList(ArrayList<RssFeed> rssFeeds){
+        ArrayList<DrawerViewModel> models = new ArrayList<>();
+
+        for(RssFeed rssFeed : rssFeeds){
+            models.add(new DrawerViewModel(rssFeed.getId(), rssFeed.getFeedName()));
+        }
+
+        mAdapter = new ArrayAdapter<DrawerViewModel>(
+                getActionBar().getThemedContext(),
+                android.R.layout.simple_list_item_activated_1,
+                android.R.id.text1, models);
+
+        mDrawerListView.setAdapter(mAdapter);
+
+        if(rssFeeds.size() > 0) {
+            if(mCurrentSelectedPosition >= rssFeeds.size()){
+                mCurrentSelectedPosition = 0;
+            }
+            selectItem(mCurrentSelectedPosition);
+        }
     }
 
     /**
@@ -204,13 +211,22 @@ public class NavigationDrawerFragment extends Fragment {
         mCurrentSelectedPosition = position;
         if (mDrawerListView != null) {
             mDrawerListView.setItemChecked(position, true);
+            if (mCallbacks != null) {
+                mCallbacks.onNavigationDrawerItemSelected(getSetlectedFeedId());
+            }
         }
         if (mDrawerLayout != null) {
             mDrawerLayout.closeDrawer(mFragmentContainerView);
         }
-        if (mCallbacks != null) {
-            mCallbacks.onNavigationDrawerItemSelected(position);
+    }
+
+    private String getSetlectedFeedId(){
+        int position = mDrawerListView.getCheckedItemPosition();
+        if(position > -1){
+            DrawerViewModel rssFeed = (DrawerViewModel)mDrawerListView.getItemAtPosition(position);
+            return rssFeed.getItemId();
         }
+        return null;
     }
 
     @Override
@@ -261,12 +277,6 @@ public class NavigationDrawerFragment extends Fragment {
 
         if (item.getItemId() == R.id.action_example) {
 
-            mAdapter = new ArrayAdapter<String>(
-                    getActionBar().getThemedContext(),
-                    android.R.layout.simple_list_item_activated_1,
-                    android.R.id.text1, new String[]{
-                    getString(R.string.title_section1)
-            });
 
             mDrawerListView.setAdapter(mAdapter);
 
@@ -299,6 +309,29 @@ public class NavigationDrawerFragment extends Fragment {
         /**
          * Called when an item in the navigation drawer is selected.
          */
-        void onNavigationDrawerItemSelected(int position);
+        void onNavigationDrawerItemSelected(String rssFeedId);
+    }
+
+    private class DrawerViewModel{
+        private String itemId;
+        private String itemName;
+
+        public DrawerViewModel(String itemId, String itemName) {
+            this.itemId = itemId;
+            this.itemName = itemName;
+        }
+
+        public String getItemName() {
+            return itemName;
+        }
+
+        public String getItemId() {
+            return itemId;
+        }
+
+        @Override
+        public String toString(){
+            return itemName;
+        }
     }
 }
