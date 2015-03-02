@@ -22,7 +22,7 @@ import java.util.ArrayList;
 
 
 public class MainActivity extends ActionBarActivity
-        implements NavigationDrawerFragment.NavigationDrawerCallbacks {
+        implements NavigationDrawerFragment.NavigationDrawerCallbacks, RssParser.RssParserListener {
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -34,6 +34,8 @@ public class MainActivity extends ActionBarActivity
      */
     private CharSequence mTitle;
     private ArrayList<RssFeed> mRssFeedList;
+    private final DataAccess mDataAccess = new DataAccess(this);
+    private final RssParser mRssParser = new RssParser(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,18 +51,8 @@ public class MainActivity extends ActionBarActivity
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
 
-
-        //TODO: Get this from database
-        mRssFeedList = new ArrayList<>();
-        RssFeed rss1 = RssFeed.CreateNew();
-        rss1.setFeedName("Wykop.pl");
-        mRssFeedList.add(rss1);
-        RssFeed rss2 = RssFeed.CreateNew();
-        rss2.setFeedName("Onet.pl");
-        mRssFeedList.add(rss2);
-        RssFeed rss3 = RssFeed.CreateNew();
-        rss3.setFeedName("Interia.pl");
-        mRssFeedList.add(rss3);
+        //get all feeds from
+        mRssFeedList = mDataAccess.getAllFeeds();
 
         mNavigationDrawerFragment.setRssFeedList(mRssFeedList);
     }
@@ -123,6 +115,11 @@ public class MainActivity extends ActionBarActivity
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void recieveRssFeed(RssFeed rssFeed){
+
+    }
+
     /**
      * A placeholder fragment containing a simple view.
      */
@@ -163,8 +160,10 @@ public class MainActivity extends ActionBarActivity
         @Override
         public void onAttach(Activity activity) {
             super.onAttach(activity);
-            ((MainActivity) activity).onSectionAttached(
-                    mRssFeed.getFeedName());
+            if(mRssFeed != null) {
+                ((MainActivity) activity).onSectionAttached(
+                        mRssFeed.getFeedName());
+            }
         }
     }
 
