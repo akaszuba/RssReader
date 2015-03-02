@@ -6,6 +6,7 @@ package com.example.rssreader;
 public class RssParser {
     public RssFeed getRssFeed(String rssFeedUrl){
         //TODO:implement
+
         return null;
     }
 }
