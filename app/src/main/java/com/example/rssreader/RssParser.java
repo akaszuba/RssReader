@@ -10,15 +10,8 @@ public class RssParser {
         mlistener = listener;
     }
 
-    public void refreshRssFeed (RssFeed rssFeed){
-        //TODO: Implement, update rssFeed
-
-        mlistener.recieveRssFeed(rssFeed);
-    }
-
-    public void getRssFeed(String rssFeedUrl){
-        //TODO:implement, Create new object
-        RssFeed rssFeed = RssFeed.CreateNew();
+    public void downloadRssFeed (RssFeed rssFeed){
+        //TODO: Implement, update rssFeed, use rssFeed.getAddress and update rssFeed.itemList
 
 
         mlistener.recieveRssFeed(rssFeed);

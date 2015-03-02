@@ -13,7 +13,7 @@ public class RssFeed {
         feed.setFeedName("");
         feed.setId(UUID.randomUUID().toString());
         feed.setItems(new ArrayList<RssFeedItem>());
-        feed.setRssAdderss("");
+        feed.setRssAddress("");
         return feed;
     }
 
@@ -30,11 +30,11 @@ public class RssFeed {
     }
 
     public String getRssAdderss() {
-        return rssAdderss;
+        return rssAddress;
     }
 
-    public void setRssAdderss(String rssAdderss) {
-        this.rssAdderss = rssAdderss;
+    public void setRssAddress(String rssAddress) {
+        this.rssAddress = rssAddress;
     }
 
     public String getId() {
@@ -54,7 +54,7 @@ public class RssFeed {
     }
 
     private String feedName;
-    private String rssAdderss;
+    private String rssAddress;
     private String id;
     private ArrayList<RssFeedItem> items;
 }
