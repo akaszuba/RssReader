@@ -1,6 +1,7 @@
 package com.example.rssreader;
 
 import android.app.Activity;
+import android.graphics.Color;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
@@ -8,6 +9,9 @@ import android.support.v4.app.FragmentManager;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
+import android.text.util.Linkify;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -16,7 +20,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import java.util.ArrayList;
 
@@ -73,11 +81,13 @@ public class MainActivity extends ActionBarActivity
         fragmentManager.beginTransaction()
                 .replace(R.id.container, PlaceholderFragment.newInstance(currentFeed))
                 .commit();
+
     }
 
     public void onSectionAttached(String rssFeedName) {
         mTitle = rssFeedName;
-    }
+
+           }
 
     public void restoreActionBar() {
         ActionBar actionBar = getSupportActionBar();
@@ -128,8 +138,13 @@ public class MainActivity extends ActionBarActivity
          * The fragment argument representing the section number for this
          * fragment.
          */
+
+        private static final String LAYOUT_CONTAINER_TAG = "RSS_LAYOUT_CONTAINER";
+        private static final String ACCORDION_BUTTON_TAG = "RSS_BUTTON_TAG";
+        private final LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT);
         private RssFeed mRssFeed;
-        private TextView displayedText;
+        private LinearLayout mAccordionList;
+
 
         /**
          * Returns a new instance of this fragment for the given section
@@ -145,6 +160,13 @@ public class MainActivity extends ActionBarActivity
         }
 
         public void refreshView(){
+            if(mRssFeed != null){
+
+            mAccordionList.removeAllViews();
+
+            for(RssFeedItem item : mRssFeed.getItems()){
+                mAccordionList.addView(generateFeedControl(mAccordionList.getContext(),item));
+            }}
         }
 
         private void setRssFeed(RssFeed rssFeed){
@@ -155,9 +177,76 @@ public class MainActivity extends ActionBarActivity
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-            //displayedText = (TextView) rootView.findViewById(R.id.textView);
-            //displayedText.setText(mRssFeed.getFeedName());
+            mAccordionList = (LinearLayout)rootView.findViewById(R.id.accordionList);
+
+            refreshView();
+
+
             return rootView;
+        }
+
+        private View generateFeedControl(Context ctx, RssFeedItem item) {
+
+            //setup layout
+            LinearLayout layout = new LinearLayout(ctx);
+            layout.setOrientation(LinearLayout.VERTICAL);
+            layout.setLayoutParams(layoutParams);
+
+            //setup feed content container
+            final LinearLayout contentLayout = new LinearLayout(ctx);
+            contentLayout.setOrientation(LinearLayout.VERTICAL);
+            contentLayout.setLayoutParams(layoutParams);
+            contentLayout.setTag(LAYOUT_CONTAINER_TAG);
+            contentLayout.setVisibility(View.GONE);
+
+            //setup description
+            final TextView descriptionTextView = new TextView(ctx);
+            descriptionTextView.setText(item.getDescription());
+
+            //setup link
+            final TextView linkTextView = new TextView(ctx);
+            linkTextView.setText(Html.fromHtml("<a href=\'" + item.getLink() + "\'>Read more...</a>"));
+            linkTextView.setMovementMethod(LinkMovementMethod.getInstance());
+            linkTextView.setAutoLinkMask(Linkify.WEB_URLS);
+            linkTextView.setGravity(Gravity.RIGHT);
+
+            //setup button
+            Button button = new Button(ctx);
+            button.setText(item.getTitle());
+            button.setTag(ACCORDION_BUTTON_TAG);
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    toggleButtonClicked(contentLayout, mAccordionList);
+
+                }
+            });
+
+            //add controls to layout
+            contentLayout.addView(descriptionTextView);
+            contentLayout.addView(linkTextView);
+            layout.addView(button);
+            layout.addView(contentLayout);
+            return layout;
+        }
+
+        private static void toggleButtonClicked(View viewToExpand, LinearLayout accordionList){
+            int itemCount = accordionList.getChildCount();
+            for(int i = 0; i<itemCount; i++){
+              //  accordionList.getChildAt(i).findViewWithTag(ACCORDION_BUTTON_TAG)
+                accordionList.getChildAt(i).findViewWithTag(LAYOUT_CONTAINER_TAG).setVisibility(View.GONE);
+            }
+            viewToExpand.setVisibility(View.VISIBLE);
+        }
+
+        private static void toggleVisibility(View view) {
+            if(view.getVisibility() == View.VISIBLE) {
+                view.setVisibility(View.GONE);
+            }
+            else{
+                view.setVisibility(View.VISIBLE);
+            }
         }
 
         @Override

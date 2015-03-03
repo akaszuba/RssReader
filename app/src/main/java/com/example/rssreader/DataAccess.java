@@ -19,7 +19,7 @@ public class DataAccess {
         //TODO: implement,Get this from database
 
         final RssFeedItem it1 = new RssFeedItem();
-        it1.setDescription("feed item description");
+        it1.setDescription("feed item descriptionfeed item descriptionfeed item descriptionfeed item descriptionfeed item descriptionfeed item descriptionfeed item descriptionfeed item descriptionfeed item description");
         it1.setLink("http://google.pl");
         it1.setTitle("Item title");
 
@@ -48,6 +48,11 @@ public class DataAccess {
         ArrayList<RssFeed>  rssFeedList = new ArrayList<>();
         RssFeed rss1 = RssFeed.CreateNew();
         rss1.setFeedName("Wykop.pl");
+        rss1.getItems().add(it1);
+        rss1.getItems().add(it2);
+        rss1.getItems().add(it3);
+        rss1.getItems().add(it4);
+        rss1.getItems().add(it5);
         rss1.getItems().add(it1);
         rss1.getItems().add(it2);
         rss1.getItems().add(it3);
