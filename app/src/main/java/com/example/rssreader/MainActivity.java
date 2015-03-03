@@ -144,6 +144,9 @@ public class MainActivity extends ActionBarActivity
         public PlaceholderFragment() {
         }
 
+        public void refreshView(){
+        }
+
         private void setRssFeed(RssFeed rssFeed){
             mRssFeed = rssFeed;
         }
@@ -152,8 +155,8 @@ public class MainActivity extends ActionBarActivity
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-            displayedText = (TextView) rootView.findViewById(R.id.textView);
-            displayedText.setText(mRssFeed.getFeedName());
+            //displayedText = (TextView) rootView.findViewById(R.id.textView);
+            //displayedText.setText(mRssFeed.getFeedName());
             return rootView;
         }
 
