@@ -43,8 +43,6 @@ public class DataAccess {
         it5.setLink("http://google.pl");
         it5.setTitle("Item title");
 
-
-
         ArrayList<RssFeed>  rssFeedList = new ArrayList<>();
         RssFeed rss1 = RssFeed.CreateNew();
         rss1.setFeedName("Wykop.pl");

@@ -1,7 +1,10 @@
 package com.example.rssreader;
 
 import android.app.Activity;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.ColorFilter;
+import android.graphics.drawable.Drawable;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
@@ -178,7 +181,6 @@ public class MainActivity extends ActionBarActivity
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
             mAccordionList = (LinearLayout)rootView.findViewById(R.id.accordionList);
-
             refreshView();
 
 
@@ -211,15 +213,17 @@ public class MainActivity extends ActionBarActivity
             linkTextView.setGravity(Gravity.RIGHT);
 
             //setup button
-            Button button = new Button(ctx);
+            ToggleButton button = new ToggleButton(ctx);
+            button.setGravity(Gravity.LEFT);
+            button.setTextOff(item.getTitle());
+            button.setTextOn(item.getTitle());
             button.setText(item.getTitle());
             button.setTag(ACCORDION_BUTTON_TAG);
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
                     toggleButtonClicked(contentLayout, mAccordionList);
-
+                    ((ToggleButton)v).setChecked(true);
                 }
             });
 
@@ -234,19 +238,13 @@ public class MainActivity extends ActionBarActivity
         private static void toggleButtonClicked(View viewToExpand, LinearLayout accordionList){
             int itemCount = accordionList.getChildCount();
             for(int i = 0; i<itemCount; i++){
-              //  accordionList.getChildAt(i).findViewWithTag(ACCORDION_BUTTON_TAG)
-                accordionList.getChildAt(i).findViewWithTag(LAYOUT_CONTAINER_TAG).setVisibility(View.GONE);
+                 View layout = accordionList.getChildAt(i).findViewWithTag(LAYOUT_CONTAINER_TAG);
+                if(layout.getVisibility() != View.GONE && layout != viewToExpand){
+                    layout.setVisibility(View.GONE);
+                }
+                ((ToggleButton)accordionList.getChildAt(i).findViewWithTag(ACCORDION_BUTTON_TAG)).setChecked(false);
             }
             viewToExpand.setVisibility(View.VISIBLE);
-        }
-
-        private static void toggleVisibility(View view) {
-            if(view.getVisibility() == View.VISIBLE) {
-                view.setVisibility(View.GONE);
-            }
-            else{
-                view.setVisibility(View.VISIBLE);
-            }
         }
 
         @Override
