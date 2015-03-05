@@ -21,7 +21,7 @@ public class DataAccess {
         final RssFeedItem it1 = new RssFeedItem();
         it1.setDescription("feed item descriptionfeed item descriptionfeed item descriptionfeed item descriptionfeed item descriptionfeed item descriptionfeed item descriptionfeed item descriptionfeed item description");
         it1.setLink("http://google.pl");
-        it1.setTitle("Item title");
+        it1.setTitle("title");
 
         final RssFeedItem it2 = new RssFeedItem();
         it2.setDescription("feed item description");
