@@ -10,6 +10,7 @@ public final class AU {
         for(T item : a){
             if(sk.Accept(item)){return item;}
         }
+        //test
         return null;
     }
 
